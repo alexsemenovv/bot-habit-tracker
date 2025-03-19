@@ -1,8 +1,7 @@
-import telebot
+from loader import bot
+from utils.set_bot_commands import set_default_commands
+import handlers
 
-from config_data import config
-
-
-token = config.BOT_TOKEN
-bot = telebot.TeleBot(token)
-
+if __name__ == '__main__':
+    set_default_commands(bot)
+    bot.polling(2)
