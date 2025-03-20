@@ -9,17 +9,18 @@ class BaseHabit(BaseModel):
     name: str
     description: Optional[str] = None
     start_date: date
+    user_id: int
 
 
 class HabitIn(BaseHabit):
-    """Схема на вход"""
+    """Схема 'привычка' на вход"""
     ...
 
 
 class HabitOut(BaseHabit):
-    """Схема на выход"""
+    """Схема 'привычка' на выход"""
     id: int
 
-    class Config:
-        """Класс HabitOut будет использоваться для сериализации ORM"""
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }
