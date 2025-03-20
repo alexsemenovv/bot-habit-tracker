@@ -24,3 +24,9 @@ class HabitOut(BaseHabit):
     model_config = {
         "from_attributes": True
     }
+
+class HabitUpdate(BaseModel):
+    """Схема для обновления полей привычки"""
+    name: Optional[str] = None
+    description: Optional[str] = None
+    start_date: Optional[date] = None
