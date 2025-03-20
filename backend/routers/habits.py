@@ -1,11 +1,12 @@
-from typing import List
+from typing import List, Any, Coroutine, Dict
 
 from fastapi import APIRouter, Depends, Path, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from sqlalchemy import delete
 
 from utils import get_session
-from schemas.habit_schemas import HabitIn, HabitOut, HabitUpdate
+from schemas.habit_schemas import HabitIn, HabitOut, HabitUpdate, SuccessResponse
 from databases.models import Habit
 
 router = APIRouter(prefix='/api/habits')
@@ -56,3 +57,18 @@ async def update_habit_by_id(
 
     await session.commit()
     return habit
+
+
+@router.delete("/{id}", response_model=SuccessResponse)
+async def update_habit_by_id(
+        id: int = Path(..., description="id привычки"),
+        session: AsyncSession = Depends(get_session)
+) -> Dict[str, bool]:
+    """Удаление привычки"""
+    result = await session.execute(select(Habit).where(id == Habit.id))
+    habit = result.scalars().first()
+    if not habit:
+        raise HTTPException(status_code=404, detail="Habit not found")
+    await session.delete(habit)
+    await session.commit()
+    return {"result": True}

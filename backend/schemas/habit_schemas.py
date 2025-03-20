@@ -30,3 +30,8 @@ class HabitUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
     start_date: Optional[date] = None
+
+
+class SuccessResponse(BaseModel):
+    """Схема: успешный ответ"""
+    result: bool
