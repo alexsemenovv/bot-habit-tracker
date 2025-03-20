@@ -4,7 +4,7 @@ from fastapi import FastAPI
 
 from utils import create_tables, drop_tables
 from routers.habits import router as habit_router
-from databases.database import engine, Base, async_session
+from routers.users import router as user_router
 
 
 @asynccontextmanager
@@ -21,3 +21,4 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 app.include_router(habit_router)
+app.include_router(user_router)
