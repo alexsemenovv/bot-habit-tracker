@@ -2,7 +2,7 @@ from datetime import datetime as dt
 
 from sqlalchemy import Column, VARCHAR, Integer, Text, Date
 
-from database import Base
+from databases.database import Base
 
 
 class Habit(Base):
