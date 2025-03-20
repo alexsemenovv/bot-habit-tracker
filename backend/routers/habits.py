@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.future import select
 
 from utils import get_session
-from databases.schemas import HabitIn, HabitOut
+from schemas.habit_schemas import HabitIn, HabitOut
 from databases.models import Habit
 
 router = APIRouter(prefix='/api/habits')
