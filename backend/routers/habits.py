@@ -13,7 +13,10 @@ router = APIRouter(prefix='/api/habits')
 
 
 @router.post("", response_model=HabitOut)
-async def add_habit(habit: HabitIn, session=Depends(get_session)) -> Habit:
+async def add_habit(
+        habit: HabitIn = Depends(),
+        session=Depends(get_session)
+) -> Habit:
     """Добавление новой привычки"""
     new_habit: Habit = Habit(**habit.model_dump())
     session.add(new_habit)
@@ -60,7 +63,7 @@ async def update_habit_by_id(
 
 
 @router.delete("/{id}", response_model=SuccessResponse)
-async def update_habit_by_id(
+async def delete_habit_by_id(
         id: int = Path(..., description="id привычки"),
         session: AsyncSession = Depends(get_session)
 ) -> Dict[str, bool]:
