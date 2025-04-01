@@ -37,7 +37,7 @@ def get_description(message: Message) -> None:
 
 
 @bot.message_handler(state=HabitInfoState.start_date)
-def get_description(message: Message) -> None:
+def get_start_date(message: Message) -> None:
     """Получение даты начала выполнения привычки"""
     start = datetime.strptime(message.text, "%d-%m-%Y")
     bot.send_message(message.from_user.id, 'Дата начала записана!')
