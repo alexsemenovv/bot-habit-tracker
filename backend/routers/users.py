@@ -1,6 +1,6 @@
-from typing import List
+from typing import List, Optional
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Path
 from sqlalchemy.future import select
 
 from utils import get_session
@@ -24,3 +24,13 @@ async def get_users(session=Depends(get_session)) -> List[User]:
     """Получение списка всех пользователей"""
     res = await session.execute(select(User))
     return res.scalars().all()
+
+
+@router.get("/{tg_id}", response_model=Optional[UserOut])
+async def get_user_by_tg_id(
+        tg_id: int = Path(..., description="Telegram id пользователя"),
+        session=Depends(get_session)
+) -> User:
+    """Получение пользователя по tg id"""
+    res = await session.execute(select(User).where(tg_id == User.tg_id))
+    return res.scalars().first()
