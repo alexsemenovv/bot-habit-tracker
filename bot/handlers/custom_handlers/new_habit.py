@@ -61,7 +61,7 @@ def get_description(message: Message) -> None:
 def get_start_date(message: CallbackQuery) -> None:
     """Получение даты начала выполнения привычки"""
     result, key, step = MyStyleCalendar(
-        calendar_id=1, min_date=datetime.date.today()
+        calendar_id=1, min_date=datetime.date.today() - datetime.timedelta(days=5)
     ).process(message.data)
     if not result and key:
         bot.edit_message_text(
