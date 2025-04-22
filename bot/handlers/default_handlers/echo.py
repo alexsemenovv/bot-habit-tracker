@@ -5,4 +5,4 @@ from loader import bot
 
 @bot.message_handler(state=None)
 def bot_echo(message: Message):
-    bot.reply_to(message, 'Для запуска бота, нажмите /start')
+    bot.reply_to(message, "Для запуска бота, нажмите /start")

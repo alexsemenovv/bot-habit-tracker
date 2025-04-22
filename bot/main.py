@@ -8,7 +8,7 @@ from loader import bot
 from utils.set_bot_commands import set_default_commands
 import handlers
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     while True:
         try:
             bot.add_custom_filter(StateFilter(bot))
