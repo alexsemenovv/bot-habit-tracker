@@ -23,5 +23,6 @@ def start(message: Message):
         add_user_with_api(data)
     bot.send_message(
         message.chat.id,
-        f"Привет, {message.from_user.full_name}! Это Бот.\nЯ умею отслеживать выполнение твоих привычек.",
+        f"Привет, {message.from_user.full_name}! Это Бот.\nЯ умею отслеживать выполнение твоих привычек.\n"
+        f"Чтобы посмотреть что я умею, нажми /help",
     )
