@@ -18,7 +18,7 @@ class MyStyleCalendar(DetailedTelegramCalendar):
         "Ноя",
         "Дек",
     )
-    DAYS_OF_WEEK = (
+    TRANSLATION_DAYS_OF_WEEK = (
         "Пн",
         "Вт",
         "Ср",
@@ -32,5 +32,6 @@ class MyStyleCalendar(DetailedTelegramCalendar):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.days_of_week["yourtransl"] = self.DAYS_OF_WEEK
-        self.months["yourtransl"] = self.TRANSLATION_MONTHS
+        self.locale = 'ru'
+        self.days_of_week["ru"] = self.TRANSLATION_DAYS_OF_WEEK
+        self.months["ru"] = self.TRANSLATION_MONTHS
