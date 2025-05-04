@@ -27,7 +27,7 @@ async def add_habit(
 @router.get("", response_model=List[HabitOut])
 async def get_habits(session=Depends(get_session)) -> List[Habit]:
     """Получение списка всех привычек"""
-    res = await session.execute(select(Habit))
+    res = await session.execute(select(Habit).filter_by(is_active=True))
     return res.scalars().all()
 
 
