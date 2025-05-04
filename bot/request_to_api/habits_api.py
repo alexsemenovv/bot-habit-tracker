@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List
 
 import requests
 
@@ -11,3 +11,12 @@ def request_to_new_habit(habit: Dict) -> bool:
     if response.status_code == 200:
         return True
     return False
+
+
+def request_to_get_all_active_habits() -> bool | List[dict]:
+    """Получение списка всех активных привычек"""
+    response = requests.get(API_URL)
+    data = response.json()
+    if data is None:
+        return False
+    return data
