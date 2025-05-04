@@ -39,6 +39,7 @@ class Habit(Base):
     description = Column(Text, nullable=True)
     start_date = Column(Date, nullable=False, default=dt.date(dt.now()))
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    is_active = Column(Boolean, nullable=True, default=True, index=True)
 
     user = relationship('User', back_populates='habits')
 
