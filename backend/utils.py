@@ -1,6 +1,6 @@
 from typing import AsyncGenerator
 
-from databases.database import async_session, engine, Base
+from databases.database import Base, async_session, engine
 
 
 async def get_session() -> AsyncGenerator:

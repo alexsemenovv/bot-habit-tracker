@@ -1,9 +1,9 @@
 import asyncio
 from logging.config import fileConfig
 
-from sqlalchemy.ext.asyncio import create_async_engine
 from alembic import context
 from databases.database import DATABASE_URL, Base  # Импортируем Base
+from sqlalchemy.ext.asyncio import create_async_engine
 
 # Создаем движок
 engine = create_async_engine(DATABASE_URL, future=True)
@@ -37,6 +37,7 @@ async def run_migrations_online() -> None:
     """Запуск миграций в онлайн-режиме."""
     async with engine.connect() as connection:
         await connection.run_sync(do_migrations)
+
 
 def do_migrations(connection):
     """Настройка Alembic перед запуском миграций."""

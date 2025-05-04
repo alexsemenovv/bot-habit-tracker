@@ -1,2 +1,1 @@
-from . import habit_schemas
-from . import user_schemas
+from . import habit_schemas, user_schemas

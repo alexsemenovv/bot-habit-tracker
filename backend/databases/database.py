@@ -1,8 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import declarative_base
 
-
-DATABASE_URL = 'sqlite+aiosqlite:///databases/my_db.db'
+DATABASE_URL = "sqlite+aiosqlite:///databases/my_db.db"
 
 engine = create_async_engine(url=DATABASE_URL)  # , echo=True) вкл/выкл логов дб
 

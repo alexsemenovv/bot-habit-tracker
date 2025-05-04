@@ -1,5 +1,6 @@
-from dotenv import find_dotenv, load_dotenv
 import os
+
+from dotenv import find_dotenv, load_dotenv
 
 if not find_dotenv():
     exit("Переменные окружения не загружены т.к. отсутствует файл .env")

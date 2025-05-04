@@ -5,6 +5,7 @@ from pydantic import BaseModel, ConfigDict
 
 class BaseUser(BaseModel):
     """Базовая схема пользователя"""
+
     first_name: str
     last_name: Optional[str] = None
     username: str
@@ -14,13 +15,13 @@ class BaseUser(BaseModel):
 
 class UserIn(BaseUser):
     """Схема 'пользователь' на вход"""
+
     ...
 
 
 class UserOut(BaseUser):
     """Схема 'пользователь' на выход"""
+
     id: int
 
-    model_config = {
-        "from_attributes": True
-    }
+    model_config = {"from_attributes": True}

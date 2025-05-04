@@ -32,6 +32,6 @@ class MyStyleCalendar(DetailedTelegramCalendar):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.locale = 'ru'
+        self.locale = "ru"
         self.days_of_week["ru"] = self.TRANSLATION_DAYS_OF_WEEK
         self.months["ru"] = self.TRANSLATION_MONTHS

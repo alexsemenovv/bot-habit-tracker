@@ -1,10 +1,9 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
-
-from utils import create_tables, drop_tables
 from routers.habits import router as habit_router
 from routers.users import router as user_router
+from utils import create_tables, drop_tables
 
 
 @asynccontextmanager
