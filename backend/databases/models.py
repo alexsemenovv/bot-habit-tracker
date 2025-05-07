@@ -26,6 +26,7 @@ class User(Base):
     is_bot = Column(Boolean, default=False, nullable=False)
 
     habits = relationship("Habit", back_populates="user")
+    duration_of_habits = relationship("DurationOfHabits", back_populates="habit")
 
     def __str__(self) -> str:
         return f"Пользователь {self.first_name} {self.username}"
@@ -43,6 +44,17 @@ class Habit(Base):
     is_active = Column(Boolean, nullable=True, default=True, index=True)
 
     user = relationship("User", back_populates="habits")
+    duration_of_habits = relationship("DurationOfHabits", back_populates="habit")
 
     def __str__(self) -> str:
         return f"Привычка: {self.name}\nДата начала: {dt.strftime(self.start_date, '%d-%m-%Y')}"
+
+
+class DurationOfHabits:
+    """Продолжительность выполнения привычки"""
+    __tablename__ = "duration_of_habits"
+    id = Column(Integer, primary_key=True, index=True)
+    habit_id = Column(Integer, ForeignKey("habits.id"), nullable=False)
+    date_of_completion = Column(Date, nullable=False, default=dt.date(dt.now()))
+
+    habit = relationship("Habit", back_populates="duration_of_habits")
