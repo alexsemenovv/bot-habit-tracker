@@ -10,6 +10,7 @@ class BaseHabit(BaseModel):
     name: str
     description: Optional[str] = None
     start_date: date
+    target_days: int
     user_id: int
 
 
