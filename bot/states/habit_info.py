@@ -7,3 +7,4 @@ class HabitInfoState(StatesGroup):
     name = State()
     description = State()
     start_date = State()
+    target_days = State()
