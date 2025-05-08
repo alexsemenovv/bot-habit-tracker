@@ -8,7 +8,7 @@ from telebot.types import (
     InlineKeyboardButton,
     InlineKeyboardMarkup,
     ReplyKeyboardMarkup,
-    KeyboardButton
+    KeyboardButton,
 )
 
 
@@ -18,7 +18,12 @@ def gen_inline_markup(buttons: List[dict]) -> InlineKeyboardMarkup:
     :param buttons: List  - список названий кнопок
     :return: клавиатуру InlineKeyboardMarkup
     """
-    buttons = [InlineKeyboardButton(text=i_btn["name"], callback_data='habit_' + str(i_btn["id"])) for i_btn in buttons]
+    buttons = [
+        InlineKeyboardButton(
+            text=i_btn["name"], callback_data="habit_" + str(i_btn["id"])
+        )
+        for i_btn in buttons
+    ]
     keyboard = InlineKeyboardMarkup(row_width=2)
     keyboard.add(*buttons)
     return keyboard
@@ -29,22 +34,38 @@ def show_list_habits(message: Message) -> None:
     """Просмотр списка всех действующих привычек"""
     response = request_to_get_all_active_habits()
     if response:
-        bot.send_message(message.from_user.id, "Ваши действующие привычки: ", reply_markup=gen_inline_markup(response))
+        bot.send_message(
+            message.from_user.id,
+            "Ваши действующие привычки: ",
+            reply_markup=gen_inline_markup(response),
+        )
     else:
-        bot.send_message(message.from_user.id, "*Вы еще не добавили ни одной привычки*", parse_mode="Markdown")
+        bot.send_message(
+            message.from_user.id,
+            "*Вы еще не добавили ни одной привычки*",
+            parse_mode="Markdown",
+        )
 
 
-@bot.callback_query_handler(func=lambda callback_query: (callback_query.data.startswith("habit_")))
+@bot.callback_query_handler(
+    func=lambda callback_query: (callback_query.data.startswith("habit_"))
+)
 def handle_habit_selection(callback_query: CallbackQuery):
     """Обработчик, предоставляет Reply клавиатуру, для выбора действия с привычкой"""
     habit_id = callback_query.data.split("_")[1]
     actions_keyboard = InlineKeyboardMarkup(row_width=2)
     actions_keyboard.add(
-        InlineKeyboardButton(text='Описание', callback_data=f"description_{habit_id}"),
-        InlineKeyboardButton(text='Редактировать', callback_data=f"edit_{habit_id}"),
-        InlineKeyboardButton(text='Удалить', callback_data=f"delete_{habit_id}"),
-        InlineKeyboardButton(text='Отметить выполненной', callback_data=f"mark_{habit_id}"),
-        InlineKeyboardButton(text='🔙Назад', callback_data=f"back"),
+        InlineKeyboardButton(text="Описание", callback_data=f"description_{habit_id}"),
+        InlineKeyboardButton(text="Редактировать", callback_data=f"edit_{habit_id}"),
+        InlineKeyboardButton(text="Удалить", callback_data=f"delete_{habit_id}"),
+        InlineKeyboardButton(
+            text="Отметить выполненной", callback_data=f"mark_{habit_id}"
+        ),
+        InlineKeyboardButton(text="🔙Назад", callback_data=f"back"),
     )
 
-    bot.send_message(callback_query.from_user.id, "Выберите действие: ", reply_markup=actions_keyboard)
+    bot.send_message(
+        callback_query.from_user.id,
+        "Выберите действие: ",
+        reply_markup=actions_keyboard,
+    )

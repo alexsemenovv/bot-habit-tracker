@@ -52,6 +52,7 @@ class Habit(Base):
 
 class HabitTrack(Base):
     """Отслеживает невыполнение/выполнение привычки в этот день"""
+
     __tablename__ = "habit_track"
     id = Column(Integer, primary_key=True, index=True)
     habit_id = Column(Integer, ForeignKey("habits.id"), nullable=False)
@@ -61,5 +62,7 @@ class HabitTrack(Base):
     habit = relationship("Habit", back_populates="habit_track")
 
     def __str__(self) -> str:
-        return (f"id привычки: {self.habit_id}\nДата выполнения: {dt.strftime(self.date_of_completion, '%d-%m-%Y')}"
-                f"\nПривычка в этот день выполнена? {'Да' if self.is_done else 'Нет'}")
+        return (
+            f"id привычки: {self.habit_id}\nДата выполнения: {dt.strftime(self.date_of_completion, '%d-%m-%Y')}"
+            f"\nПривычка в этот день выполнена? {'Да' if self.is_done else 'Нет'}"
+        )

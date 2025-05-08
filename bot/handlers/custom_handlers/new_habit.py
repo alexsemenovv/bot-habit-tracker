@@ -27,7 +27,7 @@ def get_name(message: Message) -> None:
         )  # меняем состояние
 
         with bot.retrieve_data(
-                message.from_user.id, message.chat.id
+            message.from_user.id, message.chat.id
         ) as data:  # добавляем в класс состояния - название
             data["name"] = message.text
     else:
@@ -42,14 +42,13 @@ def get_description(message: Message) -> None:
     bot.send_message(
         message.from_user.id,
         "Описание добавлено.\nВведите кол-во дней для выполнения, поставленной цели (настоятельно рекомендую выбирать не менее 21 дня): ",
-
     )
     bot.set_state(
         message.from_user.id, HabitInfoState.target_days, message.chat.id
     )  # меняем состояние
 
     with bot.retrieve_data(
-            message.from_user.id, message.chat.id
+        message.from_user.id, message.chat.id
     ) as data:  # добавляем в класс состояния - описание
         data["description"] = message.text
 
@@ -86,7 +85,7 @@ def get_start_date(message: CallbackQuery) -> None:
         )
     elif result:
         with bot.retrieve_data(
-                message.from_user.id
+            message.from_user.id
         ) as data:  # добавляем в класс состояния - дату начала
             data["start_date"] = result.isoformat()
             data["user_id"] = get_user_by_tg_id(message.from_user.id).get("id")
@@ -97,8 +96,10 @@ def get_start_date(message: CallbackQuery) -> None:
             )
         response = request_to_new_habit(data)
         if response:
-            text = (f"Привычка создана!\nНазвание привычки: {data['name']}\nОписание: {data['description']}"
-                    f"\nДата начала: {result.isoformat()}\nКоличество дней для выполнения: {data['target_days']}")
+            text = (
+                f"Привычка создана!\nНазвание привычки: {data['name']}\nОписание: {data['description']}"
+                f"\nДата начала: {result.isoformat()}\nКоличество дней для выполнения: {data['target_days']}"
+            )
         else:
             text = "Ошибка"
         bot.send_message(message.from_user.id, text)
