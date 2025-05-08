@@ -29,11 +29,11 @@ def request_to_get_all_active_habits() -> bool | List[dict]:
     return data
 
 
-def request_to_get_habit_by_id(habit_id: int) -> bool | Any:
+def request_to_get_habit_by_id(habit_id: int) -> bool | Dict:
     """
     Получение привычки по id
     :param habit_id: int - id привычки
-    :return: модель Habit
+    :return: Словарь с полями привычки
     """
     response = requests.get(API_URL + f"/{habit_id}")
     data = response.json()
