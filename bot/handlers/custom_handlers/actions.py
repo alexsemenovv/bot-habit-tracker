@@ -1,7 +1,6 @@
-from telebot.types import CallbackQuery
-
 from loader import bot
 from request_to_api.habits_api import request_to_get_habit_by_id
+from telebot.types import CallbackQuery
 
 
 @bot.callback_query_handler(
