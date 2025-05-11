@@ -52,6 +52,7 @@ def show_list_habits(message: Message) -> None:
 )
 def handle_habit_selection(callback_query: CallbackQuery):
     """Обработчик, предоставляет Reply клавиатуру, для выбора действия с привычкой"""
+
     habit_id = callback_query.data.split("_")[1]
     actions_keyboard = InlineKeyboardMarkup(row_width=2)
     actions_keyboard.add(
@@ -64,8 +65,9 @@ def handle_habit_selection(callback_query: CallbackQuery):
         InlineKeyboardButton(text="🔙Назад", callback_data=f"back"),
     )
 
-    bot.send_message(
-        callback_query.from_user.id,
-        "Выберите действие: ",
+    bot.edit_message_text(
+        chat_id=callback_query.message.chat.id,
+        message_id=callback_query.message.message_id,
+        text="Выберите действие:",
         reply_markup=actions_keyboard,
     )

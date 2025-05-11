@@ -32,7 +32,12 @@ def handle_description_habit(callback_query: CallbackQuery) -> None:
         start=habit.get("start_date"),
     )
 
-    bot.send_message(callback_query.from_user.id, info, parse_mode="Markdown")
+    bot.edit_message_text(
+        chat_id=callback_query.message.chat.id,
+        message_id=callback_query.message.message_id,
+        text=info,
+        parse_mode="Markdown",
+    )
 
 
 @bot.callback_query_handler(
@@ -47,9 +52,17 @@ def handle_delete_habit(callback_query: CallbackQuery) -> None:
     habit_id = int(callback_query.data.split("_")[1])
     result = request_to_delete_habit_by_id(habit_id)
     if result:
-        bot.send_message(callback_query.from_user.id, "Привычка удалена!\nК списку привычек /list_habits")
+        bot.edit_message_text(
+            chat_id=callback_query.message.chat.id,
+            message_id=callback_query.message.message_id,
+            text="Привычка удалена!",
+        )
     else:
-        bot.send_message(callback_query.from_user.id, 'Ошибка запроса')
+        bot.edit_message_text(
+            chat_id=callback_query.message.chat.id,
+            message_id=callback_query.message.message_id,
+            text="Ошибка запроса",
+        )
 
 
 @bot.callback_query_handler(
