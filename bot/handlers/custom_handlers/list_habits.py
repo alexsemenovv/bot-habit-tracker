@@ -62,7 +62,7 @@ def handle_habit_selection(callback_query: CallbackQuery):
         InlineKeyboardButton(
             text="Отметить выполненной", callback_data=f"mark_{habit_id}"
         ),
-        InlineKeyboardButton(text="🔙Назад", callback_data=f"back"),
+        InlineKeyboardButton(text="🔙Назад", callback_data="back_to_list_habits"),
     )
 
     bot.edit_message_text(

@@ -1,10 +1,23 @@
-from handlers.custom_handlers.list_habits import gen_inline_markup
+from handlers.custom_handlers.list_habits import gen_inline_markup, handle_habit_selection
 from loader import bot
 from request_to_api.habits_api import (
     request_to_get_habit_by_id,
     request_to_delete_habit_by_id, request_to_get_all_active_habits,
 )
-from telebot.types import CallbackQuery
+from telebot.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
+
+
+def gen_inline_markup_for_back_to_crud() -> InlineKeyboardMarkup:
+    """
+    Создание Inline клавиатуры для кнопки 'Назад к действиям'
+    :return: клавиатуру InlineKeyboardMarkup
+    """
+
+    keyboard = InlineKeyboardMarkup()
+    keyboard.add(
+        InlineKeyboardButton(text="🔙Назад", callback_data="back_to_crud"),
+    )
+    return keyboard
 
 
 @bot.callback_query_handler(
@@ -36,6 +49,7 @@ def handle_description_habit(callback_query: CallbackQuery) -> None:
         chat_id=callback_query.message.chat.id,
         message_id=callback_query.message.message_id,
         text=info,
+        reply_markup=gen_inline_markup_for_back_to_crud(),
         parse_mode="Markdown",
     )
 
@@ -66,12 +80,12 @@ def handle_delete_habit(callback_query: CallbackQuery) -> None:
 
 
 @bot.callback_query_handler(
-    func=lambda callback_query: (callback_query.data.startswith("back"))
+    func=lambda callback_query: (callback_query.data == "back_to_list_habits")
 )
 def handle_btn_back(callback_query: CallbackQuery) -> None:
     """
     При нажатии на кнопку 'назад' - возвращает список привычек
-    :param callback_query: CallbackQuery - запрос, который начинается на 'back'
+    :param callback_query: CallbackQuery - запрос, который равен 'back_to_list_habits'
     :return: None
     """
     response = request_to_get_all_active_habits()
@@ -87,3 +101,15 @@ def handle_btn_back(callback_query: CallbackQuery) -> None:
             "*Вы еще не добавили ни одной привычки*",
             parse_mode="Markdown",
         )
+
+
+@bot.callback_query_handler(
+    func=lambda callback_query: (callback_query.data == "back_to_crud")
+)
+def handle_btn_back(callback_query: CallbackQuery) -> None:
+    """
+    При нажатии на кнопку 'назад' - возвращает список действий для привычки
+    :param callback_query: CallbackQuery - запрос, который равен на 'back_to_crud'
+    :return: None
+    """
+    handle_habit_selection(callback_query)
