@@ -40,3 +40,16 @@ def request_to_get_habit_by_id(habit_id: int) -> bool | Dict:
     if data is None:
         return False
     return data
+
+
+def request_to_delete_habit_by_id(habit_id: int) -> bool:
+    """
+    Запрос на удаление привычки
+    :param habit_id: int - id привычки
+    :return: True - если удалена, иначе False
+    """
+    response = requests.delete(API_URL + f"/{habit_id}")
+    data = response.json()
+    if data:
+        return data['result']
+    return False
