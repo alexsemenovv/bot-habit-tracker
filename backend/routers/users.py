@@ -1,9 +1,10 @@
 from typing import List, Optional
 
-from databases.models import User
 from fastapi import APIRouter, Depends, Path
-from schemas.user_schemas import UserIn, UserOut
 from sqlalchemy.future import select
+
+from databases.models import User
+from schemas.user_schemas import UserIn, UserOut
 from utils import get_session
 
 router = APIRouter(prefix="/api/users")
