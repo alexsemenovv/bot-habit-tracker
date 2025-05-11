@@ -10,12 +10,27 @@ from telebot.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardBut
 def gen_inline_markup_for_back_to_crud(habit_id: int) -> InlineKeyboardMarkup:
     """
     Создание Inline клавиатуры для кнопки 'Назад к действиям'
+    :param habit_id: int - id привычки
     :return: клавиатуру InlineKeyboardMarkup
     """
 
     keyboard = InlineKeyboardMarkup()
     keyboard.add(
         InlineKeyboardButton(text="🔙Назад", callback_data=f"back_to_crud_{habit_id}"),
+    )
+    return keyboard
+
+
+def gen_inline_markup_yes_or_no(habit_id: int) -> InlineKeyboardMarkup:
+    """
+    Создание Inline клавиатуры для подтверждения удаления привычки, с кнопками 'Да', 'Нет'
+    :param habit_id: int - id привычки
+    :return: клавиатуру InlineKeyboardMarkup
+    """
+    keyboard = InlineKeyboardMarkup()
+    keyboard.add(
+        InlineKeyboardButton(text="Да", callback_data=f"yes_{habit_id}"),
+        InlineKeyboardButton(text="Нет", callback_data=f"no_delete_habit_{habit_id}"),
     )
     return keyboard
 
@@ -64,6 +79,24 @@ def handle_delete_habit(callback_query: CallbackQuery) -> None:
     :return: None
     """
     habit_id = int(callback_query.data.split("_")[1])
+    bot.edit_message_text(
+        chat_id=callback_query.message.chat.id,
+        message_id=callback_query.message.message_id,
+        text=f"Вы уверены что хотите удалить привычку?",
+        reply_markup=gen_inline_markup_yes_or_no(habit_id)
+    )
+
+
+@bot.callback_query_handler(
+    func=lambda callback_query: (callback_query.data.startswith("yes_"))
+)
+def handle_yes_delete_habit(callback_query: CallbackQuery) -> None:
+    """
+    Удаление привычки по id
+    :param callback_query: Запрос, который начинается на yes_
+    :return: None
+    """
+    habit_id = int(callback_query.data.split("_")[1])
     result = request_to_delete_habit_by_id(habit_id)
     if result:
         bot.edit_message_text(
@@ -77,6 +110,18 @@ def handle_delete_habit(callback_query: CallbackQuery) -> None:
             message_id=callback_query.message.message_id,
             text="Ошибка запроса",
         )
+
+
+@bot.callback_query_handler(
+    func=lambda callback_query: (callback_query.data.startswith("no_delete_habit_"))
+)
+def handle_no_delete_habit(callback_query: CallbackQuery) -> None:
+    """
+    Отмена удаления привычки по id
+    :param callback_query: Запрос, который начинается на no_delete_habit_
+    :return: None
+    """
+    handle_habit_selection(callback_query, edit=True)
 
 
 @bot.callback_query_handler(
