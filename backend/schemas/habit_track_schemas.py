@@ -4,11 +4,10 @@ from pydantic import BaseModel
 
 
 class BaseHabitTrack(BaseModel):
-    """Базовая схема 'Трек привычки' """
+    """Базовая схема 'Трек привычки'"""
 
     habit_id: int
     date_of_completion: date
-    target_days: int
     is_done: bool
 
 
@@ -24,3 +23,9 @@ class HabitTrackOut(BaseHabitTrack):
     id: int
 
     model_config = {"from_attributes": True}
+
+
+class SuccessResponse(BaseModel):
+    """Схема: успешный ответ"""
+
+    result: bool
