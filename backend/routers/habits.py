@@ -1,11 +1,11 @@
-from typing import Any, Coroutine, Dict, List
+from typing import Dict, List
 
-from databases.models import Habit
 from fastapi import APIRouter, Depends, HTTPException, Path
-from schemas.habit_schemas import HabitIn, HabitOut, HabitUpdate, SuccessResponse
-from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+
+from databases.models import Habit
+from schemas.habit_schemas import HabitIn, HabitOut, HabitUpdate, SuccessResponse
 from utils import get_session
 
 router = APIRouter(prefix="/api/habits")
@@ -33,7 +33,10 @@ async def get_habit_by_id(
 ) -> Habit:
     """Получение привычки по id"""
     res = await session.execute(select(Habit).where(id == Habit.id))
-    return res.scalars().first()
+    habit = res.scalars().first()
+    if not habit:
+        raise HTTPException(status_code=404, detail=f"Habit with {id} id, not found")
+    return habit
 
 
 @router.patch("/{id}", response_model=HabitOut)
