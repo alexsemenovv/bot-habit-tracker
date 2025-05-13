@@ -1,7 +1,3 @@
-from typing import List
-
-from loader import bot
-from request_to_api.habits_api import request_to_get_all_active_habits
 from telebot.types import (
     CallbackQuery,
     InlineKeyboardButton,
@@ -10,22 +6,9 @@ from telebot.types import (
     Message,
 )
 
-
-def gen_inline_markup(buttons: List[dict]) -> InlineKeyboardMarkup:
-    """
-    Создание Inline клавиатуры
-    :param buttons: List  - список названий кнопок
-    :return: клавиатуру InlineKeyboardMarkup
-    """
-    buttons = [
-        InlineKeyboardButton(
-            text=i_btn["name"], callback_data="habit_" + str(i_btn["id"])
-        )
-        for i_btn in buttons
-    ]
-    keyboard = InlineKeyboardMarkup(row_width=2)
-    keyboard.add(*buttons)
-    return keyboard
+from keyboards import inline as inline_keyboard
+from loader import bot
+from request_to_api.habits_api import request_to_get_all_active_habits
 
 
 @bot.message_handler(commands=["list_habits"])
@@ -38,8 +21,12 @@ def show_list_habits(message: Message, edit: bool = False) -> None:
     """
     response = request_to_get_all_active_habits()
     if response:
+        response = [
+            {"text": i_btn["name"], "callback_data": "habit_" + str(i_btn["id"])}
+            for i_btn in response
+        ]
         text = "Ваши действующие привычки: "
-        markup = gen_inline_markup(response)
+        markup = inline_keyboard.gen_inline_markup(response)
         if edit:
             bot.edit_message_text(
                 chat_id=message.chat.id,

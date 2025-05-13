@@ -1,38 +1,15 @@
-from handlers.custom_handlers.list_habits import gen_inline_markup, handle_habit_selection, show_list_habits
+from telebot.types import CallbackQuery
+
+from handlers.custom_handlers.list_habits import (
+    handle_habit_selection,
+    show_list_habits,
+)
+from keyboards import inline as inline_keyboard
 from loader import bot
 from request_to_api.habits_api import (
-    request_to_get_habit_by_id,
     request_to_delete_habit_by_id,
+    request_to_get_habit_by_id,
 )
-from telebot.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
-
-
-def gen_inline_markup_for_back_to_crud(habit_id: int) -> InlineKeyboardMarkup:
-    """
-    Создание Inline клавиатуры для кнопки 'Назад к действиям'
-    :param habit_id: int - id привычки
-    :return: клавиатуру InlineKeyboardMarkup
-    """
-
-    keyboard = InlineKeyboardMarkup()
-    keyboard.add(
-        InlineKeyboardButton(text="🔙Назад", callback_data=f"back_to_crud_{habit_id}"),
-    )
-    return keyboard
-
-
-def gen_inline_markup_yes_or_no(habit_id: int) -> InlineKeyboardMarkup:
-    """
-    Создание Inline клавиатуры для подтверждения удаления привычки, с кнопками 'Да', 'Нет'
-    :param habit_id: int - id привычки
-    :return: клавиатуру InlineKeyboardMarkup
-    """
-    keyboard = InlineKeyboardMarkup()
-    keyboard.add(
-        InlineKeyboardButton(text="Да", callback_data=f"yes_{habit_id}"),
-        InlineKeyboardButton(text="Нет", callback_data=f"no_delete_habit_{habit_id}"),
-    )
-    return keyboard
 
 
 @bot.callback_query_handler(
@@ -59,12 +36,12 @@ def handle_description_habit(callback_query: CallbackQuery) -> None:
         target_days=habit.get("target_days"),
         start=habit.get("start_date"),
     )
-
+    buttons = [{"text": "🔙Назад", "callback_data": "back_to_crud_" + str(habit_id)}]
     bot.edit_message_text(
         chat_id=callback_query.message.chat.id,
         message_id=callback_query.message.message_id,
         text=info,
-        reply_markup=gen_inline_markup_for_back_to_crud(habit_id),
+        reply_markup=inline_keyboard.gen_inline_markup(buttons=buttons),
         parse_mode="Markdown",
     )
 
@@ -79,11 +56,15 @@ def handle_delete_habit(callback_query: CallbackQuery) -> None:
     :return: None
     """
     habit_id = int(callback_query.data.split("_")[1])
+    buttons = [
+        {"text": "Да", "callback_data": "yes_" + str(habit_id)},
+        {"text": "Нет", "callback_data": "no_delete_habit_" + str(habit_id)},
+    ]
     bot.edit_message_text(
         chat_id=callback_query.message.chat.id,
         message_id=callback_query.message.message_id,
         text=f"Вы уверены что хотите удалить привычку?",
-        reply_markup=gen_inline_markup_yes_or_no(habit_id)
+        reply_markup=inline_keyboard.gen_inline_markup(buttons=buttons),
     )
 
 
@@ -127,7 +108,7 @@ def handle_no_delete_habit(callback_query: CallbackQuery) -> None:
 @bot.callback_query_handler(
     func=lambda callback_query: (callback_query.data == "back_to_list_habits")
 )
-def handle_btn_back(callback_query: CallbackQuery) -> None:
+def handle_btn_back_to_list_habits(callback_query: CallbackQuery) -> None:
     """
     При нажатии на кнопку 'назад' - возвращает список привычек
     :param callback_query: CallbackQuery - запрос, который равен 'back_to_list_habits'
@@ -139,7 +120,7 @@ def handle_btn_back(callback_query: CallbackQuery) -> None:
 @bot.callback_query_handler(
     func=lambda callback_query: (callback_query.data.startswith("back_to_crud_"))
 )
-def handle_btn_back(callback_query: CallbackQuery) -> None:
+def handle_btn_back_to_crud(callback_query: CallbackQuery) -> None:
     """
     При нажатии на кнопку 'назад' - возвращает список действий для привычки
     :param callback_query: CallbackQuery - запрос, который начинается на 'back_to_crud'
