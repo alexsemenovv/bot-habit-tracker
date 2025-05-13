@@ -28,7 +28,7 @@ def handle_mark_habit(callback_query: CallbackQuery) -> None:
         count_days = request_to_count_days_mark_habit(habit_id)
         text = f"Привычка на сегодня отмечена выполненной!👍\nТак держать💪\nУже выполненно дней: {count_days}"
     else:
-        text = "Ошибка отметки"
+        text = "Эта привычка уже отмечена выполненной сегодня!"
     bot.edit_message_text(
         chat_id=callback_query.message.chat.id,
         message_id=callback_query.message.message_id,
