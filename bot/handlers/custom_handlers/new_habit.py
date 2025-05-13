@@ -1,12 +1,13 @@
 import datetime
 
+from telebot.types import CallbackQuery, Message
+from telegram_bot_calendar import LSTEP
+
 from keyboards.reply import calendar_markup
 from loader import bot
 from request_to_api.habits_api import request_to_new_habit
 from request_to_api.users_api import get_user_by_tg_id
 from states.habit_info import HabitInfoState
-from telebot.types import CallbackQuery, Message
-from telegram_bot_calendar import LSTEP
 from utils.calendar import MyStyleCalendar
 
 
