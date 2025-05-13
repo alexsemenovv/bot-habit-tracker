@@ -18,3 +18,17 @@ def request_to_mark_habit_by_id(habit_id: int) -> bool:
         return data
     else:
         return False
+
+
+def request_to_count_days_mark_habit(habit_id: int) -> int:
+    """
+    Запрос о количестве дней, выполнения привычки
+    :param habit_id: int - id привычки
+    :return: int - количество дней
+    """
+    response = requests.get(API_URL + f"/count_days/{habit_id}")
+    if response.status_code == 200:
+        data = response.json()
+        return data
+    else:
+        return False

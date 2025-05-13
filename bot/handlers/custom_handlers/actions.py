@@ -10,7 +10,7 @@ from request_to_api.habits_api import (
     request_to_delete_habit_by_id,
     request_to_get_habit_by_id,
 )
-from request_to_api.habits_track_api import request_to_mark_habit_by_id
+from request_to_api.habits_track_api import request_to_mark_habit_by_id, request_to_count_days_mark_habit
 
 
 @bot.callback_query_handler(
@@ -25,7 +25,8 @@ def handle_mark_habit(callback_query: CallbackQuery) -> None:
     habit_id = int(callback_query.data.split("_")[1])
     response = request_to_mark_habit_by_id(habit_id)
     if response:
-        text = "Привычка на сегодня отмечена выполненной!👍\nТак держать💪"
+        count_days = request_to_count_days_mark_habit(habit_id)
+        text = f"Привычка на сегодня отмечена выполненной!👍\nТак держать💪\nУже выполненно дней: {count_days}"
     else:
         text = "Ошибка отметки"
     bot.edit_message_text(
@@ -46,18 +47,21 @@ def handle_description_habit(callback_query: CallbackQuery) -> None:
     """
     habit_id = int(callback_query.data.split("_")[1])
     habit = request_to_get_habit_by_id(habit_id)
+    count_days = request_to_count_days_mark_habit(habit_id)
     info = (
         "*Привычка* №{id}"
         "\n*Название:* {name}"
         "\n*Описание:* {description}"
         "\n*Дата начала:* {start}"
         "\n*Дней для выполнения:* {target_days}"
+        "\n*Уже выполнено дней:* {count_days}"
     ).format(
         id=habit.get("id"),
         name=habit.get("name"),
         description=habit.get("description"),
         target_days=habit.get("target_days"),
         start=habit.get("start_date"),
+        count_days=count_days,
     )
     buttons = [{"text": "🔙Назад", "callback_data": "back_to_crud_" + str(habit_id)}]
     bot.edit_message_text(
