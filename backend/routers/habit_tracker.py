@@ -1,9 +1,10 @@
 from typing import Dict, List
+from datetime import datetime as dt
 
 from fastapi import APIRouter, Depends, HTTPException, Path
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy import func
+from sqlalchemy import func, and_
 
 from databases.models import HabitTrack
 from schemas.habit_track_schemas import HabitTrackIn, HabitTrackOut, SuccessResponse
@@ -17,6 +18,14 @@ async def add_habit_track(
         habit_track: HabitTrackIn, session=Depends(get_session)
 ) -> HabitTrack:
     """Добавление новой модели 'Трек привычки'"""
+    result = await session.execute(
+        select(HabitTrack).where(and_(HabitTrack.habit_id == habit_track.habit_id, HabitTrack.date_of_completion == dt.date(dt.now())))
+    )
+    res = result.scalar()
+    if res:
+        raise HTTPException(
+            status_code=409, detail=f"HabitTrack for habit.id={habit_track.habit_id} today, already exists"
+        )
     new_habit_track: HabitTrack = HabitTrack(**habit_track.model_dump())
     session.add(new_habit_track)
     await session.commit()
