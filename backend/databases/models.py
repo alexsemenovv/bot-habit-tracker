@@ -44,7 +44,7 @@ class Habit(Base):
     is_active = Column(Boolean, nullable=True, default=True, index=True)
 
     user = relationship("User", back_populates="habits")
-    habit_track = relationship("HabitTrack", back_populates="habit")
+    habit_track = relationship("HabitTrack", back_populates="habit", cascade="all, delete-orphan")
 
     def __str__(self) -> str:
         return f"Привычка: {self.name}\nДата начала: {dt.strftime(self.start_date, '%d-%m-%Y')}"
@@ -57,7 +57,7 @@ class HabitTrack(Base):
     id = Column(Integer, primary_key=True, index=True)
     habit_id = Column(Integer, ForeignKey("habits.id"), nullable=False)
     date_of_completion = Column(Date, nullable=False, default=dt.date(dt.now()))
-    is_done = Column(Boolean, nullable=False, index=True)
+    is_done = Column(Boolean, nullable=False, default=True, index=True)
 
     habit = relationship("Habit", back_populates="habit_track")
 
