@@ -8,7 +8,6 @@ class BaseHabitTrack(BaseModel):
 
     habit_id: int
     date_of_completion: date
-    is_done: bool
 
 
 class HabitTrackIn(BaseHabitTrack):
