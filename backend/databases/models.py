@@ -1,6 +1,5 @@
 from datetime import datetime as dt
 
-from databases.database import Base
 from sqlalchemy import (
     VARCHAR,
     BigInteger,
@@ -12,6 +11,8 @@ from sqlalchemy import (
     Text,
 )
 from sqlalchemy.orm import relationship
+
+from databases.database import Base
 
 
 class User(Base):
@@ -44,7 +45,9 @@ class Habit(Base):
     is_active = Column(Boolean, nullable=True, default=True, index=True)
 
     user = relationship("User", back_populates="habits")
-    habit_track = relationship("HabitTrack", back_populates="habit", cascade="all, delete-orphan")
+    habit_track = relationship(
+        "HabitTrack", back_populates="habit", cascade="all, delete-orphan"
+    )
 
     def __str__(self) -> str:
         return f"Привычка: {self.name}\nДата начала: {dt.strftime(self.start_date, '%d-%m-%Y')}"
