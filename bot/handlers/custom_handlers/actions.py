@@ -10,6 +10,27 @@ from request_to_api.habits_api import (
     request_to_delete_habit_by_id,
     request_to_get_habit_by_id,
 )
+from request_to_api.habits_track_api import request_to_mark_habit_by_id
+
+
+@bot.callback_query_handler(
+    func=lambda callback_query: (callback_query.data.startswith("mark_"))
+)
+def handle_mark_habit(callback_query: CallbackQuery) -> None:
+    """
+    Обработчик, отмечает привычку выполненной
+    :param callback_query: CallbackQuery - запрос, который начинается на 'mark_'
+    :return: None
+    """
+    habit_id = int(callback_query.data.split("_")[1])
+    response = request_to_mark_habit_by_id(habit_id)
+    if response:
+        text = "Привычка на сегодня отмечена выполненной!👍\nТак держать💪"
+    else:
+        text = 'Ошибка отметки'
+    bot.edit_message_text(chat_id=callback_query.message.chat.id,
+                          message_id=callback_query.message.message_id,
+                          text=text)
 
 
 @bot.callback_query_handler(
