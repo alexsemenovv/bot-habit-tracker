@@ -27,10 +27,12 @@ def handle_mark_habit(callback_query: CallbackQuery) -> None:
     if response:
         text = "Привычка на сегодня отмечена выполненной!👍\nТак держать💪"
     else:
-        text = 'Ошибка отметки'
-    bot.edit_message_text(chat_id=callback_query.message.chat.id,
-                          message_id=callback_query.message.message_id,
-                          text=text)
+        text = "Ошибка отметки"
+    bot.edit_message_text(
+        chat_id=callback_query.message.chat.id,
+        message_id=callback_query.message.message_id,
+        text=text,
+    )
 
 
 @bot.callback_query_handler(
