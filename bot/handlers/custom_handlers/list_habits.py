@@ -62,7 +62,7 @@ def show_list_habits(message: Message, edit: bool = False) -> None:
 )
 def handle_habit_selection(callback_query: CallbackQuery, edit: bool = False) -> None:
     """
-    Обработчик, предоставляет Reply клавиатуру, для выбора действия с привычкой
+    Обработчик, предоставляет Inline клавиатуру, для выбора действия с привычкой
     :param callback_query: запрос начинающийся на habit_ или back_to_crud_
     :param edit: Если True - то значит id будет лежать по индексу 3, иначе 1
     :return: None
