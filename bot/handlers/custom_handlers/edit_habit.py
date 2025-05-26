@@ -105,3 +105,68 @@ def process_new_habit_name(message: Message) -> None:
         "Выберите поле для редактирования:",
         reply_markup=get_edit_habit_markup(habit_id),
     )
+
+
+@bot.callback_query_handler(
+    func=lambda callback_query: (callback_query.data.startswith("update_description_"))
+)
+def handle_update_description_habit(callback_query: CallbackQuery) -> None:
+    """
+    Обработчик, предоставляет поле для редактирования описания привычки
+    :param callback_query: CallbackQuery - запрос, который начинается на 'update_description_'
+    :return: None
+    """
+    habit_id = int(callback_query.data.split("_")[2])
+    user_id = callback_query.from_user.id
+    chat_id = callback_query.message.chat.id
+    habit = request_to_get_habit_by_id(habit_id)
+
+    bot.set_state(user_id, HabitInfoState.description, chat_id)
+    with bot.retrieve_data(user_id, chat_id) as data:
+        data["habit_id"] = habit_id
+
+    text = f"Текущее описание привычки: *{habit['description']}*\nВведите новое описание:"
+    buttons = [{"text": "Отмена", "callback_data": f"edit_{str(habit_id)}"}]
+    markup = inline_keyboard.gen_inline_markup(buttons=buttons, row_width=1)
+
+    bot.edit_message_text(
+        chat_id=chat_id,
+        message_id=callback_query.message.message_id,
+        text=text,
+        reply_markup=markup,
+        parse_mode="Markdown"
+    )
+
+    bot.register_next_step_handler_by_chat_id(
+        chat_id, process_new_habit_description
+    )
+
+
+@bot.message_handler(state=HabitInfoState.description)
+def process_new_habit_description(message: Message) -> None:
+    """
+    Получение нового описания для привычки
+    :param message: Message - новое описание для привычки
+    :return: None
+    """
+    user_id = message.from_user.id
+    chat_id = message.chat.id
+    with bot.retrieve_data(user_id, chat_id) as data:
+        habit_id = data["habit_id"]
+
+    new_desc = {"description": message.text.strip()}
+
+    result = request_to_update_habit_by_id(habit_id=habit_id, fields=new_desc)
+    if result:
+        bot.send_message(chat_id, f"Описание привычки обновлено на: *{new_desc.get('description')}*",
+                         parse_mode="Markdown")
+    else:
+        bot.send_message(message.from_user.id, "Не получилось обновить привычку...")
+
+    bot.delete_state(user_id, chat_id)
+
+    bot.send_message(
+        chat_id,
+        "Выберите поле для редактирования:",
+        reply_markup=get_edit_habit_markup(habit_id),
+    )
