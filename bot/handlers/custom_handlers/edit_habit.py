@@ -1,13 +1,27 @@
-from telebot.types import CallbackQuery, Message
+from telebot.types import CallbackQuery, Message, InlineKeyboardMarkup
 
 from keyboards import inline as inline_keyboard
 from loader import bot
 from request_to_api.habits_api import (
     request_to_get_habit_by_id, request_to_update_habit_by_id,
 )
+from states.habit_info import HabitInfoState
 
-# Словарь для хранения состояний (можно заменить на FSM или хранилище)
-user_habit_edit_state = {}  # user_id: habit_id
+
+def get_edit_habit_markup(habit_id: int) -> InlineKeyboardMarkup:
+    """
+    Создание inline клавиатуры для редактирования привычки
+    :param habit_id: int - id привычки
+    :return: клавиатура Inline
+    """
+    buttons = [
+        {"text": "Название", "callback_data": f"update_name_{habit_id}"},
+        {"text": "Описание", "callback_data": f"update_description_{habit_id}"},
+        {"text": "Дата начала", "callback_data": f"update_start_date_{habit_id}"},
+        {"text": "Количество дней для выполнения", "callback_data": f"update_target_days_{habit_id}"},
+        {"text": "🔙Назад", "callback_data": f"back_to_crud_{habit_id}"},
+    ]
+    return inline_keyboard.gen_inline_markup(buttons=buttons, row_width=1)
 
 
 @bot.callback_query_handler(
@@ -20,41 +34,38 @@ def handle_edit_habit(callback_query: CallbackQuery) -> None:
     :return: None
     """
     habit_id = int(callback_query.data.split("_")[1])
-    buttons = [
-        {"text": "Название", "callback_data": "update_name_" + str(habit_id)},
-        {"text": "Описание", "callback_data": "update_description_" + str(habit_id)},
-        {"text": "Дата начала", "callback_data": "update_start_date_" + str(habit_id)},
-        {"text": "Количество дней для выполнения", "callback_data": "update_target_days_" + str(habit_id)},
-        {"text": "🔙Назад", "callback_data": "back_to_crud_" + str(habit_id)},
-    ]
     bot.edit_message_text(
         chat_id=callback_query.message.chat.id,
         message_id=callback_query.message.message_id,
         text="Выберите поле для редактирования",
-        reply_markup=inline_keyboard.gen_inline_markup(buttons=buttons, row_width=1),
+        reply_markup=get_edit_habit_markup(habit_id),
     )
 
 
 @bot.callback_query_handler(
     func=lambda callback_query: (callback_query.data.startswith("update_name_"))
 )
-def handle_edit_name_habit(callback_query: CallbackQuery) -> None:
+def handle_update_name_habit(callback_query: CallbackQuery) -> None:
     """
     Обработчик, предоставляет поле для редактирования названия привычки
-    :param callback_query: CallbackQuery - запрос, который начинается на 'edit_name_'
+    :param callback_query: CallbackQuery - запрос, который начинается на 'update_name_'
     :return: None
     """
     habit_id = int(callback_query.data.split("_")[2])
     user_id = callback_query.from_user.id
+    chat_id = callback_query.message.chat.id
     habit = request_to_get_habit_by_id(habit_id)
-    user_habit_edit_state[user_id] = habit_id
+
+    bot.set_state(user_id, HabitInfoState.name, chat_id)
+    with bot.retrieve_data(user_id, chat_id) as data:
+        data["habit_id"] = habit_id
 
     text = f"Текущее название привычки: *{habit['name']}*\nВведите новое название:"
-    buttons = [{"text": "Отмена", "callback_data": "edit_" + str(habit_id)}]
+    buttons = [{"text": "Отмена", "callback_data": f"edit_{str(habit_id)}"}]
     markup = inline_keyboard.gen_inline_markup(buttons=buttons, row_width=1)
 
     bot.edit_message_text(
-        chat_id=callback_query.message.chat.id,
+        chat_id=chat_id,
         message_id=callback_query.message.message_id,
         text=text,
         reply_markup=markup,
@@ -62,25 +73,35 @@ def handle_edit_name_habit(callback_query: CallbackQuery) -> None:
     )
 
     bot.register_next_step_handler_by_chat_id(
-        callback_query.message.chat.id, process_new_habit_name
+        chat_id, process_new_habit_name
     )
 
 
+@bot.message_handler(state=HabitInfoState.name)
 def process_new_habit_name(message: Message) -> None:
+    """
+    Получение нового названия для привычки
+    :param message: Message - новое название для привычки
+    :return: None
+    """
     user_id = message.from_user.id
-    if user_id not in user_habit_edit_state:
-        bot.send_message(message.chat.id, "Что-то пошло не так. Попробуйте снова.")
-        return
+    chat_id = message.chat.id
+    with bot.retrieve_data(user_id, chat_id) as data:
+        habit_id = data["habit_id"]
 
     new_name = {"name": message.text.strip()}
 
-    result = request_to_update_habit_by_id(habit_id=user_habit_edit_state[user_id], fields=new_name)
+    result = request_to_update_habit_by_id(habit_id=habit_id, fields=new_name)
     if result:
-        bot.send_message(message.chat.id, f"Название привычки обновлено на: *{new_name.get('name')}*",
+        bot.send_message(chat_id, f"Название привычки обновлено на: *{new_name.get('name')}*",
                          parse_mode="Markdown")
     else:
         bot.send_message(message.from_user.id, "Не получилось обновить привычку...")
-    # Здесь можно вернуть пользователя назад в меню редактирования
 
+    bot.delete_state(user_id, chat_id)
 
-
+    bot.send_message(
+        chat_id,
+        "Выберите поле для редактирования:",
+        reply_markup=get_edit_habit_markup(habit_id),
+    )
