@@ -4,8 +4,8 @@ from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 
 def gen_inline_markup(
-        buttons: List[Dict[str, str]],
-        row_width: int = 2,
+    buttons: List[Dict[str, str]],
+    row_width: int = 2,
 ) -> InlineKeyboardMarkup:
     """
     Создание Inline клавиатуры
@@ -19,6 +19,8 @@ def gen_inline_markup(
         for i_btn in buttons
     ]
 
-    keyboard = InlineKeyboardMarkup(row_width=row_width, )
+    keyboard = InlineKeyboardMarkup(
+        row_width=row_width,
+    )
     keyboard.add(*buttons)
     return keyboard

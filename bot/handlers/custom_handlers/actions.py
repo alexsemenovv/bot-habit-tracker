@@ -1,5 +1,3 @@
-from telebot.types import CallbackQuery
-
 from handlers.custom_handlers.list_habits import (
     handle_habit_selection,
     show_list_habits,
@@ -10,7 +8,11 @@ from request_to_api.habits_api import (
     request_to_delete_habit_by_id,
     request_to_get_habit_by_id,
 )
-from request_to_api.habits_track_api import request_to_mark_habit_by_id, request_to_count_days_mark_habit
+from request_to_api.habits_track_api import (
+    request_to_count_days_mark_habit,
+    request_to_mark_habit_by_id,
+)
+from telebot.types import CallbackQuery
 
 
 @bot.callback_query_handler(

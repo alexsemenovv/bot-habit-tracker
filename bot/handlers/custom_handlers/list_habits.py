@@ -1,3 +1,6 @@
+from keyboards import inline as inline_keyboard
+from loader import bot
+from request_to_api.habits_api import request_to_get_all_active_habits
 from telebot.types import (
     CallbackQuery,
     InlineKeyboardButton,
@@ -5,10 +8,6 @@ from telebot.types import (
     KeyboardButton,
     Message,
 )
-
-from keyboards import inline as inline_keyboard
-from loader import bot
-from request_to_api.habits_api import request_to_get_all_active_habits
 
 
 @bot.message_handler(commands=["list_habits"])

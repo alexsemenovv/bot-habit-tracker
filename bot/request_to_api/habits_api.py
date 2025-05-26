@@ -51,7 +51,7 @@ def request_to_delete_habit_by_id(habit_id: int) -> bool:
     response = requests.delete(API_URL + f"/{habit_id}")
     data = response.json()
     if data:
-        return data['result']
+        return data["result"]
     return False
 
 

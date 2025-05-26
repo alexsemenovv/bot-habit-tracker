@@ -1,10 +1,9 @@
-from telebot.types import Message
-
 from main import bot
 from request_to_api.users_api import (
     add_user_with_api,
     get_user_by_tg_id,
 )
+from telebot.types import Message
 
 
 @bot.message_handler(commands=["start"])
