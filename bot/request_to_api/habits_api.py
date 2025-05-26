@@ -53,3 +53,18 @@ def request_to_delete_habit_by_id(habit_id: int) -> bool:
     if data:
         return data['result']
     return False
+
+
+def request_to_update_habit_by_id(habit_id: int, fields: Dict) -> bool:
+    """
+    Запрос на редактирование привычки
+    :param
+        habit_id: int - id привычки
+        fields: Dict - словарь с полями привычки
+    :return: True - если успешно, иначе False
+    """
+    response = requests.patch(API_URL + f"/{habit_id}", json=fields)
+    data = response.json()
+    if data:
+        return True
+    return False
