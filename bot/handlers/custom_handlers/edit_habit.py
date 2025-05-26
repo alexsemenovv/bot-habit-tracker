@@ -248,3 +248,68 @@ def get_new_start_date(callback_query: CallbackQuery) -> None:
             "Выберите поле для редактирования:",
             reply_markup=get_edit_habit_markup(habit_id),
         )
+
+
+@bot.callback_query_handler(
+    func=lambda callback_query: (callback_query.data.startswith("update_target_days_"))
+)
+def handle_update_target_days__habit(callback_query: CallbackQuery) -> None:
+    """
+    Обработчик, предоставляет поле для редактирования дней для выполнения привычки
+    :param callback_query: CallbackQuery - запрос, который начинается на 'update_target_days_'
+    :return: None
+    """
+    habit_id = int(callback_query.data.split("_")[3])
+    user_id = callback_query.from_user.id
+    chat_id = callback_query.message.chat.id
+    habit = request_to_get_habit_by_id(habit_id)
+
+    bot.set_state(user_id, HabitInfoState.target_days, chat_id)
+    with bot.retrieve_data(user_id, chat_id) as data:
+        data["habit_id"] = habit_id
+
+    text = f"Текущее кол-во дней для выполнения привычки: *{habit['target_days']}*\nВведите новое:"
+    buttons = [{"text": "Отмена", "callback_data": f"edit_{str(habit_id)}"}]
+    markup = inline_keyboard.gen_inline_markup(buttons=buttons, row_width=1)
+
+    bot.edit_message_text(
+        chat_id=chat_id,
+        message_id=callback_query.message.message_id,
+        text=text,
+        reply_markup=markup,
+        parse_mode="Markdown"
+    )
+
+    bot.register_next_step_handler_by_chat_id(
+        chat_id, process_new_target_days_description
+    )
+
+
+@bot.message_handler(state=HabitInfoState.target_days)
+def process_new_target_days_description(message: Message) -> None:
+    """
+    Получение нового кол-ва дней для привычки
+    :param message: Message - target days
+    :return: None
+    """
+    user_id = message.from_user.id
+    chat_id = message.chat.id
+    with bot.retrieve_data(user_id, chat_id) as data:
+        habit_id = data["habit_id"]
+
+    new_desc = {"target_days": message.text.strip()}
+
+    result = request_to_update_habit_by_id(habit_id=habit_id, fields=new_desc)
+    if result:
+        bot.send_message(chat_id, f"Количество дней обновлено на: *{new_desc.get('target_days')}*",
+                         parse_mode="Markdown")
+    else:
+        bot.send_message(message.from_user.id, "Не получилось обновить привычку...")
+
+    bot.delete_state(user_id, chat_id)
+
+    bot.send_message(
+        chat_id,
+        "Выберите поле для редактирования:",
+        reply_markup=get_edit_habit_markup(habit_id),
+    )
