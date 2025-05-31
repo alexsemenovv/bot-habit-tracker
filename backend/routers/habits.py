@@ -1,10 +1,10 @@
-from typing import Dict, List
+from typing import Dict, List, Any, Coroutine
 
-from fastapi import APIRouter, Depends, HTTPException, Path
+from fastapi import APIRouter, Depends, HTTPException, Path, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from databases.models import Habit
+from databases.models import Habit, User
 from schemas.habit_schemas import HabitIn, HabitOut, HabitUpdate, SuccessResponse
 from utils import get_session
 
@@ -21,15 +21,27 @@ async def add_habit(habit: HabitIn, session=Depends(get_session)) -> Habit:
 
 
 @router.get("", response_model=List[HabitOut])
-async def get_habits(session=Depends(get_session)) -> List[Habit]:
-    """Получение списка всех привычек"""
-    res = await session.execute(select(Habit).filter_by(is_active=True))
+async def get_habits(
+        user_tg_id: int = Query(None, title="TG id user", description="User id for list habits", gt=0),
+        session=Depends(get_session)
+) -> Any | None:
+    """
+    Получение списка всех привычек
+    :param user_tg_id: int Телеграмм id пользователя
+    :param session: сессия
+    :return: Список привычек для пользователя с user_tg_id | None
+    """
+    query = await session.execute(select(User).filter_by(tg_id=user_tg_id))
+    user = query.scalars().first()
+    if not user:
+        return None
+    res = await session.execute(select(Habit).filter_by(is_active=True, user_id=user.id))
     return res.scalars().all()
 
 
 @router.get("/{id}", response_model=HabitOut)
 async def get_habit_by_id(
-    id: int = Path(..., description="id привычки"), session=Depends(get_session)
+        id: int = Path(..., description="id привычки"), session=Depends(get_session)
 ) -> Habit:
     """Получение привычки по id"""
     res = await session.execute(select(Habit).where(id == Habit.id))
@@ -41,9 +53,9 @@ async def get_habit_by_id(
 
 @router.patch("/{id}", response_model=HabitOut)
 async def update_habit_by_id(
-    habit_in: HabitUpdate,
-    id: int = Path(..., description="id привычки"),
-    session: AsyncSession = Depends(get_session),
+        habit_in: HabitUpdate,
+        id: int = Path(..., description="id привычки"),
+        session: AsyncSession = Depends(get_session),
 ) -> Habit:
     """Редактирование полей привычки"""
     result = await session.execute(select(Habit).where(id == Habit.id))
@@ -62,8 +74,8 @@ async def update_habit_by_id(
 
 @router.delete("/{id}", response_model=SuccessResponse)
 async def delete_habit_by_id(
-    id: int = Path(..., description="id привычки"),
-    session: AsyncSession = Depends(get_session),
+        id: int = Path(..., description="id привычки"),
+        session: AsyncSession = Depends(get_session),
 ) -> Dict[str, bool]:
     """Удаление привычки"""
     result = await session.execute(select(Habit).where(id == Habit.id))
