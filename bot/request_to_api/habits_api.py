@@ -17,12 +17,14 @@ def request_to_new_habit(habit: Dict) -> bool:
     return False
 
 
-def request_to_get_all_active_habits() -> bool | List[dict]:
+def request_to_get_all_active_habits(user_tg_id: int) -> bool | List[dict]:
     """
     Получение списка всех активных привычек
+    :param
+        user_tg_id: int - telegram id пользователя
     :return: Список с привычками
     """
-    response = requests.get(API_URL)
+    response = requests.get(API_URL, params={"user_tg_id": user_tg_id})
     data = response.json()
     if data is None:
         return False
