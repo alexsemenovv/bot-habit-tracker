@@ -17,7 +17,10 @@ def show_list_habits(message: Message, edit: bool = False) -> None:
     :param edit: редактируемое ли сообщение, по умолчанию False
     :return: None
     """
-    user_tg_id = message.from_user.id
+    if edit:
+        user_tg_id = message.chat.id
+    else:
+        user_tg_id = message.from_user.id
     response = request_to_get_all_active_habits(user_tg_id=user_tg_id)
     if response:
         response = [
